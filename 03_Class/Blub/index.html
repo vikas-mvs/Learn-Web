@@ -52,7 +52,13 @@
     </div>
 
     <script>
+        var clickSound = new Audio('ClickSound.mp3');
+
         function toggleBulb() {
+            // Play click sound
+            clickSound.currentTime = 0; // Reset sound to start if clicked rapidly
+            clickSound.play();
+
             var img = document.getElementById('bulbImage');
             var btn = document.getElementById('switchBtn');
 
