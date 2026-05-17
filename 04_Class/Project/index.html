@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-purple: #4a3672;
+            --btn-purple: #4c3b71;
+            --btn-hover: #3d2f5a;
+            --bg-color: #fdfcfa;
+            --text-dark: #333;
+            --text-gray: #6b6b6b;
+            --gold: #cba363;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, #fef8f0 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, #fcf7fa 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Nav */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--primary-purple); font-size: 1.1rem; line-height: 1.2;}
+        .logo img { height: 45px; border-radius: 8px;}
+        .nav-links { display: flex; gap: 35px; list-style: none; }
+        .nav-links a { text-decoration: none; color: #555; font-weight: 500; font-size: 0.95rem; }
+        .nav-links a.active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 3px; }
+        .btn-signin { background-color: var(--btn-purple); color: white; padding: 10px 24px; border-radius: 25px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+
+        /* Hero */
+        .hero { display: flex; align-items: center; justify-content: space-between; padding: 40px 0 80px; gap: 40px; }
+        .hero-content { flex: 1.2; position: relative; }
+        
+        /* Background sparkels */
+        .sparkle-1 { position: absolute; top: -20px; left: -40px; color: #f3d78d; font-size: 2rem; }
+        .sparkle-2 { position: absolute; top: 10px; right: 10%; color: #f3d78d; font-size: 1.2rem; }
+        .sparkle-3 { position: absolute; top: -50px; right: -50px; color: #f3d78d; font-size: 1.5rem; }
+
+        .greeting { color: var(--gold); font-weight: 500; font-size: 1.2rem; margin-bottom: 0; }
+        .name { font-family: 'Dancing Script', cursive; font-size: 6rem; color: var(--primary-purple); line-height: 1; margin-bottom: 20px; letter-spacing: 1px; }
+        .slogan { background-color: #fdf9f1; display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 12px; font-weight: 600; color: #444; margin-bottom: 25px; border: 1px solid #f2e8d5; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
+        .bio { color: var(--text-gray); margin-bottom: 35px; max-width: 420px; font-size: 0.95rem; line-height: 1.7; }
+        
+        .hero-buttons { display: flex; gap: 15px; }
+        .btn-primary { background-color: var(--btn-purple); color: white; padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: 500; font-size: 0.95rem; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-outline { background-color: transparent; color: var(--btn-purple); padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: 500; font-size: 0.95rem; border: 1px solid #d3cadd; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
+        /* Hero Image Refined */
+        .hero-image-wrapper { flex: 0.8; display: flex; justify-content: flex-end; position: relative; }
+        
+        .image-card-bg {
+            background-color: #fff9f0;
+            border-radius: 25px;
+            padding: 25px;
+            width: 380px;
+            height: 520px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid #f5ede0;
+        }
+
+        /* The solid purple oval shape behind the user image */
+        .purple-oval-bg {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            height: 440px;
+            background: linear-gradient(180deg, #dfcbf2 0%, #ecdcf7 100%);
+            border-radius: 160px 160px 20px 20px;
+            z-index: 1;
+        }
+
+        .image-card-bg img.user-photo {
+            position: relative;
+            z-index: 3;
+            width: 300px;
+            height: 420px;
+            object-fit: cover;
+            border-radius: 150px 150px 20px 20px;
+            display: block;
+        }
+
+        /* Info Cards */
+        .info-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 50px; }
+        .card { border-radius: 25px; padding: 35px 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.5); }
+        .card-icon { width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.4rem; margin-bottom: 20px; }
+        .card h3 { color: var(--primary-purple); margin-bottom: 15px; font-size: 1.3rem; font-weight: 600;}
+        
+        .card-about { background: linear-gradient(180deg, #faf5fc 0%, #f3ebf7 100%); }
+        .card-about .card-icon { background-color: var(--primary-purple); }
+        .card-about p { color: var(--text-gray); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;}
+        .card-about .laptop-img { font-size: 4.5rem; color: #a48bbd; margin-top: auto; opacity: 0.8;}
+
+        .card-skills { background: linear-gradient(180deg, #fffbf7 0%, #fff6ec 100%); }
+        .card-skills .card-icon { background-color: var(--primary-purple); }
+        .skills-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 25px; }
+        .skill-tag { background-color: white; color: var(--primary-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; border: 1px solid #f0e6fa; font-weight: 500;}
+        .card-skills p { font-family: 'Dancing Script', cursive; color: var(--primary-purple); font-size: 1.2rem; margin-top: auto;}
+
+        .card-schedule { background: linear-gradient(180deg, #fffaf2 0%, #fff3e0 100%); }
+        .card-schedule .card-icon { background-color: #cda869; }
+        .schedule-list { width: 100%; text-align: left; margin-bottom: 20px; font-size: 0.85rem; color: #555;}
+        .schedule-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e4d3ba; }
+        .schedule-item:last-child { border-bottom: none; }
+        .schedule-item i { color: #cda869; margin-right: 10px; width: 15px;}
+        .card-schedule p { font-size: 0.8rem; color: var(--text-gray); margin-top: auto; line-height: 1.5;}
+
+        /* Connect Section */
+        .connect-section { background-color: #fef8f0; border-radius: 25px; padding: 40px 50px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border: 1px solid #faeedb;}
+        .connect-left h3 { color: var(--primary-purple); margin-bottom: 8px; font-size: 1.4rem;}
+        .connect-left p { color: var(--text-gray); margin-bottom: 25px; font-size: 0.9rem; line-height: 1.5;}
+        .social-icons { display: flex; gap: 12px; }
+        .social-icons a { width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; text-decoration: none; transition: 0.3s; font-size: 1.1rem; }
+        .social-icons .fb { background-color: #4267B2; }
+        .social-icons .ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .social-icons .git { background-color: #333; }
+        .social-icons .wa { background-color: #25D366; }
+
+        .connect-middle { display: flex; flex-direction: column; gap: 15px; border-left: 1px solid #eaddf0; padding-left: 40px;}
+        .contact-item { display: flex; align-items: flex-start; gap: 15px; font-size: 0.85rem; color: #555; line-height: 1.4;}
+        .contact-item i { color: var(--primary-purple); font-size: 1.1rem; margin-top: 3px;}
+
+        .connect-illustration img { width: 180px; mix-blend-mode: multiply; }
+
+        /* Footer */
+        .footer-divider { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 30px 0 15px; }
+        .footer-divider span { height: 1px; width: 300px; background-color: #eeddbb; }
+        .footer-divider i { color: #eeddbb; font-size: 0.8rem; }
+        footer { text-align: center; padding-bottom: 30px; color: var(--primary-purple); font-size: 0.85rem; font-weight: 500;}
+
+        /* Global Leaves */
+        .global-top-leaves { position: absolute; top: 0; left: 0; width: 200px; z-index: -1; mix-blend-mode: multiply; opacity: 0.8;}
+
+        @media (max-width: 900px) {
+            .hero { flex-direction: column; text-align: center; }
+            .hero-content { align-items: center; display: flex; flex-direction: column; }
+            .hero-image-wrapper { justify-content: center; }
+            .info-cards { grid-template-columns: 1fr; }
+            .connect-section { flex-direction: column; gap: 30px; text-align: center; }
+            .connect-middle { border-left: none; padding-left: 0; border-top: 1px solid #eaddf0; padding-top: 20px; align-items: center; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <img src="top_leaves.png" alt="" class="global-top-leaves">
+    <div class="container">
+        <!-- Navbar -->
+        <nav>
+            <div class="logo">
+                <img src="logo.png" alt="AXL CodeX">
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active">Home</a></li>
+                <li><a href="#">E.com <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i></a></li>
+                <li><a href="#">Syllabus</a></li>
+                <li><a href="#">Course</a></li>
+                <li><a href="#">Books</a></li>
+            </ul>
+            <a href="#" class="btn-signin"><i class="fa-regular fa-user"></i> Sign In</a>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <span class="sparkle-1">✨</span>
+                <p class="greeting">Hello I'm</p>
+                <h1 class="name">Vikas <span class="sparkle-2">✨</span></h1>
+                <div class="slogan">
+                    💪 जब तक तोड़ेंगे 🔨 नहीं तब तक छोड़ेंगे नहीं 🏆
+                </div>
+                <p class="bio">
+                    I'm a BCA student who enjoy coding and building projects. I'm focused on improving my skills in this field and love turning ideas into real-world solutions.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn-primary">Explore Courses <i class="fa-solid fa-arrow-right"></i></button>
+                    <button class="btn-outline"><i class="fa-solid fa-book-open"></i> View Syllabus</button>
+                </div>
+            </div>
+            <div class="hero-image-wrapper">
+                <span class="sparkle-3">✨</span>
+                <div class="image-card-bg">
+                    <div class="purple-oval-bg"></div>
+                    <!-- User's Photo -->
+                    <img src="vikas.jpg" alt="Vikas" class="user-photo">
+                </div>
+            </div>
+        </section>
+
+        <!-- Info Cards -->
+        <section class="info-cards">
+            <!-- About Me -->
+            <div class="card card-about">
+                <div class="card-icon"><i class="fa-solid fa-user"></i></div>
+                <h3>About Me</h3>
+                <p>I'm a BCA student who enjoy coding and building projects. I'm focused on improving my skills in this field.</p>
+                <div class="laptop-img"><i class="fa-solid fa-laptop-code"></i></div>
+            </div>
+
+            <!-- Skills -->
+            <div class="card card-skills">
+                <div class="card-icon"><i class="fa-solid fa-code"></i></div>
+                <h3>My Skills</h3>
+                <div class="skills-container">
+                    <span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span>
+                    <span class="skill-tag">Python</span><span class="skill-tag">Java</span><span class="skill-tag">C++</span>
+                    <span class="skill-tag">SQL</span>
+                </div>
+                <p>Let's build something amazing! <i class="fa-solid fa-heart" style="color:#d4af37; font-size:0.9rem; margin-left:5px;"></i></p>
+            </div>
+
+            <!-- Schedule -->
+            <div class="card card-schedule">
+                <div class="card-icon"><i class="fa-regular fa-calendar-alt"></i></div>
+                <h3>Schedule</h3>
+                <div class="schedule-list">
+                    <div class="schedule-item"><span><i class="fa-regular fa-clock"></i> Mon - Fri</span><span>5:00 PM - 8:00 PM</span></div>
+                    <div class="schedule-item"><span><i class="fa-regular fa-calendar-check"></i> Saturday</span><span>10:00 AM - 1:00 PM</span></div>
+                    <div class="schedule-item"><span><i class="fa-regular fa-calendar-times"></i> Sunday</span><span>Closed</span></div>
+                </div>
+                <p>Timings may vary on special days.<br>Stay connected!</p>
+            </div>
+        </section>
+
+        <!-- Connect Section -->
+        <section class="connect-section">
+            <div class="connect-left">
+                <h3>Let's Connect</h3>
+                <p>Follow me on social media for<br>updates, tips & more!</p>
+                <div class="social-icons">
+                    <a href="#" class="fb"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="ig"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="git"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="wa"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="connect-middle">
+                <div class="contact-item"><i class="fa-solid fa-location-dot"></i><span>AT - JALALPUR, LALGANJ, VAISHALI<br>Branch - 3rd</span></div>
+                <div class="contact-item"><i class="fa-solid fa-phone"></i><span>9608552201</span></div>
+                <div class="contact-item"><i class="fa-solid fa-envelope"></i><span>princekumar9931</span></div>
+            </div>
+            <div class="connect-illustration">
+                <img src="books_cup.png" alt="Books">
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div class="footer-divider">
+            <span></span><i class="fa-solid fa-heart"></i><span></span>
+        </div>
+        <footer>
+            <p>&copy; 2025 AXL CodeX. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
