@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - AXL CodeX</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f0c29);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: #fff;
+    padding: 40px 20px;
+  }
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 20px 40px;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .navbar h1 {
+    font-size: 1.8em;
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .btn-logout {
+    padding: 10px 25px;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-logout:hover {
+    background: #ff6b81;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+  }
+  .table-container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 18px 20px;
+    text-align: left;
+  }
+  th {
+    background: rgba(0, 0, 0, 0.3);
+    color: #00c6ff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+  }
+  tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.3s ease;
+  }
+  tbody tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+  td {
+    color: #ccc;
+  }
+  .badge {
+    padding: 5px 10px;
+    background: rgba(138, 43, 226, 0.2);
+    color: #df9cff;
+    border-radius: 20px;
+    font-size: 0.85em;
+    border: 1px solid rgba(138, 43, 226, 0.5);
+  }
+  #loadingRow {
+    text-align: center;
+    padding: 40px;
+    color: rgba(255,255,255,0.5);
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>👑 Admin Control Panel</h1>
+  <div style="display: flex; gap: 15px;">
+    <button onclick="window.location.href='index.html'" style="padding: 10px 25px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">Home</button>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Photo</th>
+        <th>Full Name</th>
+        <th>Email Address</th>
+        <th>Phone Number</th>
+        <th>Enrolled Course</th>
+        <th>Gender</th>
+        <th>Semester</th>
+      </tr>
+    </thead>
+    <tbody id="dataTable">
+      <tr><td colspan="7" id="loadingRow">Loading applications...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script type="module">
+import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔐 Protect admin page
+let isDataLoaded = false;
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert("❌ Login first");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // 👑 Check admin role
+  if (user.email !== ADMIN_EMAIL) {
+    alert("❌ Access Denied");
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  // Admin is verified, load data only once
+  if (!isDataLoaded) {
+    isDataLoaded = true;
+    await loadData();
+  }
+});
+
+// 📊 Fetch data
+async function loadData(){
+  try {
+    const q = query(collection(db, "applications"), orderBy("timestamp", "desc"));
+    const querySnapshot = await getDocs(q);
+    const table = document.getElementById("dataTable");
+    table.innerHTML = "";
+
+    if(querySnapshot.empty) {
+      table.innerHTML = `<tr><td colspan="7" style="text-align:center;">No applications found.</td></tr>`;
+      return;
+    }
+
+    querySnapshot.forEach((doc) => {
+      const item = doc.data();
+      const photoHtml = item.photoUrl 
+        ? `<img src="${item.photoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid #00c6ff;">`
+        : `<div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.8em; color: #ccc;">N/A</div>`;
+        
+      table.innerHTML += `
+        <tr>
+          <td>${photoHtml}</td>
+          <td><strong>${item.name || 'N/A'}</strong></td>
+          <td>${item.email || 'N/A'}</td>
+          <td>${item.phone || 'N/A'}</td>
+          <td><span class="badge">${item.course || 'N/A'}</span></td>
+          <td>${item.gender || 'N/A'}</td>
+          <td>${item.semester || 'N/A'}</td>
+        </tr>
+      `;
+    });
+  } catch(err) {
+    console.error(err);
+    // Fallback if index doesn't exist yet for ordering
+    if(err.message.includes("index")) {
+      const querySnapshot = await getDocs(collection(db, "applications"));
+      const table = document.getElementById("dataTable");
+      table.innerHTML = "";
+      querySnapshot.forEach((doc) => {
+        const item = doc.data();
+        const photoHtml = item.photoUrl 
+          ? `<img src="${item.photoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid #00c6ff;">`
+          : `<div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.8em; color: #ccc;">N/A</div>`;
+          
+        table.innerHTML += `
+          <tr>
+            <td>${photoHtml}</td>
+            <td><strong>${item.name || 'N/A'}</strong></td>
+            <td>${item.email || 'N/A'}</td>
+            <td>${item.phone || 'N/A'}</td>
+            <td><span class="badge">${item.course || 'N/A'}</span></td>
+            <td>${item.gender || 'N/A'}</td>
+            <td>${item.semester || 'N/A'}</td>
+          </tr>
+        `;
+      });
+    } else {
+      document.getElementById("dataTable").innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ff4757;">Failed to load data: ${err.message}</td></tr>`;
+    }
+  }
+}
+
+// 🔓 Logout
+window.logout = function(){
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  }).catch((error) => {
+    alert("Error logging out: " + error.message);
+  });
+}
+</script>
+
+</body>
+</html>

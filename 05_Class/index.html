@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Form </title>
     <style>
-        *{
+        * {
             box-sizing: border-box;
         }
+
         body {
             height: 100vh;
             display: grid;
             place-items: center;
         }
+
         .container {
             width: 400px;
             margin: 0 auto;
@@ -23,23 +26,29 @@
             box-shadow: 5px 5px 20px 2px rgba(0, 154, 196, 0.576);
 
         }
+
         form {
             display: flex;
             flex-direction: column;
             gap: 2px;
-            
+
         }
-        input, select, textarea {
+
+        input,
+        select,
+        textarea {
             margin-bottom: 10px;
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 3px;
         }
+
         img {
             display: block;
             margin: 0 auto 20px;
             border-radius: 50%;
         }
+
         h1 {
             text-align: center;
             margin-bottom: 20px;
@@ -47,22 +56,59 @@
             box-shadow: 2px 2px 5px gray;
             border-radius: 10px;
         }
+
         h2 {
             text-align: center;
             margin-bottom: 20px;
             color: rgb(0, 69, 129);
         }
-        #submit {
-            background-color: #00a4f7;
+
+        #submitbtn {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
             color: white;
+            padding: 12px;
+            font-size: 18px;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
-            padding: 10px;
             font-weight: bold;
-            font-size: 20px
+            transition: 0.3s;
+        }
+
+        #submitbtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00c6ff;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 5px solid #ccc;
+            border-top: 5px solid #00c6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #00c853;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <img src="logo.png" alt="logo" width="100" height="100">
@@ -80,7 +126,7 @@
             </fieldset>
 
             <label for="phone">Phone :</label>
-            <input type="tel" id="phone" name="phone" placeholder=" 77766-6444"  required>
+            <input type="number" id="phone" name="phone" placeholder=" 77766-6444" required>
 
             <label for="email">Email :</label>
             <input type="email" id="email" name="email" placeholder="abcd@gmail.com" required>
@@ -106,48 +152,77 @@
             <select name="semester" id="semester" required>
                 <legend>Choose your Semester</legend>
                 <option value="">Select your semester</option>
-                <option value="1 sem">1st Semester</option>
-                <option value="2 sem">2nd Semester</option>
-                <option value="3 sem">3rd Semester</option>
-                <option value="4 sem">4th Semester</option>
-                <option value="5 sem">5th Semester</option>
-                <option value="6 sem">6th Semester</option>
+                <option value="1st sem">1st Semester</option>
+                <option value="2nd sem">2nd Semester</option>
+                <option value="3rd sem">3rd Semester</option>
+                <option value="4th sem">4th Semester</option>
+                <option value="5th sem">5th Semester</option>
+                <option value="6th sem">6th Semester</option>
             </select>
             <label for="feedback">Feedback :</label>
             <textarea name="feedback" id="feedback" placeholder="Enter your feedback" cols="30" rows="5"></textarea>
-            <input type="submit" value="Submit" id="submit">
+            <button type="submit" id="submitbtn">Submit</button>
         </form>
+        <div id="loader" style="display:none;">
+            <div class="spinner"></div>
+            <p style="text-align:center;">Submitting...</p>
+        </div>
 
-<script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbwc2OZSZFkkTepI0Jr5jbfSujlA3uc2gl6kkIkgsfnoG1a1Z4Tjx5zi9R-9Ne81J0e5jw/exec";
+        <div id="successPopup" class="popup">✅ Submitted Successfully</div>
 
-document.getElementById("form").addEventListener("submit", function(e) {
-    e.preventDefault();
+    </div>
 
-    const data = {
-        name: document.getElementById("name").value,
-        gender: document.querySelector('input[name="gender"]:checked')?.value || "",
-        phone: document.getElementById("phone").value,
-        email: document.getElementById("email").value,
-        college: document.getElementById("college").value,
-        course: document.querySelector('input[name="course"]:checked')?.value || "",
-        semester: document.getElementById("semester").value,
-        feedback: document.getElementById("feedback").value
-    };
 
-    fetch(scriptURL, {
-        method: "POST",
-        mode: "no-cors", 
-        body: JSON.stringify(data)
-    })
-    .then(() => {
-        alert("✅ Form Submitted Successfully!");
-        document.getElementById("form").reset();
-    })
-    .catch(() => {
-        alert("❌ Submission Failed");
-    });
-});
-</script>
+    <script>
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwKkhfxsHbrF_r1S1qyFrzde3uha8YRAAJZI_hmSR9-FbfPxlTnVrxxACUvAqPPjWfh8A/exec";
+
+        document.getElementById("form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const btn = document.getElementById("submitbtn");
+            btn.disabled = true;
+            btn.textContent = "Submitting...";
+
+            const form = document.getElementById("form");
+            const loader = document.getElementById("loader");
+            const popup = document.getElementById("successPopup");
+
+            loader.style.display = "block";
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            fetch(scriptURL, {
+                method: "POST",
+                body: JSON.stringify(data)
+            })
+                .then(response => response.text().then(text => ({ ok: response.ok, status: response.status, text })))
+                .then(({ ok, status, text }) => {
+                    // Log full response for debugging (check browser console)
+                    console.log('Google Apps Script response:', { status, text });
+
+                    if (!ok) {
+                        // If server returned non-2xx, treat as error so catch() runs
+                        throw new Error('Server returned ' + status + ': ' + text);
+                    }
+
+                    form.reset();
+                    loader.style.display = "none";
+                    popup.style.display = "block";
+
+                    setTimeout(() => popup.style.display = "none", 3000);
+                })
+                .catch((err) => {
+                    // Show more helpful message and log the error
+                    console.error('Submission error:', err);
+                    loader.style.display = "none";
+                    alert("❌ Submission Failed. Check console for details.");
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.textContent = "Submit";
+                });
+        });
+    </script>
 </body>
+
 </html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - AXL CodeX</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f0c29);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: #fff;
+    overflow: hidden;
+    position: relative;
+  }
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    z-index: 10;
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2em;
+    font-weight: 600;
+  }
+  .input-group {
+    margin-bottom: 20px;
+  }
+  input {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1em;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  input:focus {
+    border-color: #00c6ff;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+  }
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+  }
+  button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-login {
+    background: #0072ff;
+    color: #fff;
+  }
+  .btn-login:hover {
+    background: #0056b3;
+    box-shadow: 0 0 15px rgba(0, 114, 255, 0.5);
+  }
+  .btn-signup {
+    background: transparent;
+    color: #00c6ff;
+    border: 1px solid #00c6ff;
+  }
+  .btn-signup:hover {
+    background: rgba(0, 198, 255, 0.1);
+  }
+  .blobs {
+    position: absolute;
+    filter: blur(80px);
+    z-index: 0;
+    opacity: 0.5;
+    border-radius: 50%;
+    animation: float 10s ease-in-out infinite;
+  }
+  .blob1 { top: 5%; left: 10%; width: 250px; height: 250px; background: #00c6ff; }
+  .blob2 { bottom: 5%; right: 10%; width: 300px; height: 300px; background: #ff0072; animation-delay: -5s; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.1); }
+  }
+  .nav-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 0.9em;
+    z-index: 20;
+    transition: color 0.3s;
+  }
+  .nav-back:hover {
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="nav-back">← Back to Home</a>
+
+<div class="blobs blob1"></div>
+<div class="blobs blob2"></div>
+
+<div class="box">
+  <h2>Welcome Back</h2>
+  <div class="input-group">
+    <input type="email" id="email" placeholder="Email Address">
+  </div>
+  <div class="input-group">
+    <input type="password" id="password" placeholder="Password">
+  </div>
+  <div style="text-align: right; margin-bottom: 20px;">
+    <a href="#" onclick="forgotPassword(event)" style="color: #00c6ff; font-size: 0.85em; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#00c6ff'">Forgot Password?</a>
+  </div>
+  <div class="btn-group">
+    <button class="btn-signup" onclick="signup()">Signup</button>
+    <button class="btn-login" onclick="login()">Login</button>
+  </div>
+  <div style="margin-top: 20px; text-align: center;">
+    <a href="register.html" style="all: unset; color: rgba(255,255,255,0.7); font-size: 0.9em; cursor: pointer; text-decoration: underline; transition: color 0.3s;">Want to enroll? Register for a course</a>
+  </div>
+</div>
+
+<script type="module">
+import { auth, ADMIN_EMAIL } from './firebase-config.js';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+window.signup = async function() {
+  const emailVal = document.getElementById('email').value;
+  const passwordVal = document.getElementById('password').value;
+  
+  if(!emailVal || !passwordVal) return alert("Please enter email and password");
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, emailVal, passwordVal);
+    await sendEmailVerification(userCredential.user);
+    alert("Signup successful! A verification link has been sent to your email. Please check your inbox.");
+    if(emailVal === ADMIN_EMAIL) {
+      window.location.href = "admin.html";
+    } else {
+      window.location.href = "dashboard.html";
+    }
+  } catch (error) {
+    alert("Signup Error: " + error.message);
+  }
+}
+
+window.login = async function() {
+  const emailVal = document.getElementById('email').value;
+  const passwordVal = document.getElementById('password').value;
+  
+  if(!emailVal || !passwordVal) return alert("Please enter email and password");
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, emailVal, passwordVal);
+    const user = userCredential.user;
+    
+    if(user.email === ADMIN_EMAIL) {
+      window.location.href = "admin.html";
+    } else {
+      window.location.href = "dashboard.html";
+    }
+  } catch (error) {
+    alert("Login failed: " + error.message);
+  }
+}
+
+window.forgotPassword = async function(e) {
+  e.preventDefault();
+  const emailVal = document.getElementById('email').value;
+  
+  if(!emailVal) return alert("Please enter your email address in the box first!");
+
+  try {
+    await sendPasswordResetEmail(auth, emailVal);
+    alert("Password reset link has been sent to your email. Please check your inbox!");
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+}
+</script>
+</body>
+</html>

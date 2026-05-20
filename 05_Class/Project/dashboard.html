@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - AXL CodeX</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f0c29);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: #fff;
+    overflow: hidden;
+    position: relative;
+  }
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .container {
+    width: 500px;
+    padding: 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 10px;
+    font-size: 2.2em;
+    font-weight: 600;
+    background: linear-gradient(to right, #00c6ff, #8a2be2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  p {
+    color: #ccc;
+    margin-bottom: 30px;
+  }
+  .card {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .card h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #00c6ff;
+  }
+  .btn-logout {
+    padding: 12px 30px;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-logout:hover {
+    background: #ff6b81;
+    box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+    transform: translateY(-2px);
+  }
+  .blobs {
+    position: absolute;
+    filter: blur(80px);
+    z-index: 0;
+    opacity: 0.5;
+    border-radius: 50%;
+    animation: float 10s ease-in-out infinite;
+  }
+  .blob1 { top: 10%; right: 10%; width: 300px; height: 300px; background: #8a2be2; }
+  .blob2 { bottom: 10%; left: 10%; width: 250px; height: 250px; background: #0072ff; animation-delay: -5s; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.1); }
+  }
+</style>
+</head>
+<body>
+
+<div class="blobs blob1"></div>
+<div class="blobs blob2"></div>
+
+<div class="container">
+  <h2>Welcome to Dashboard</h2>
+  <p id="userEmail">Loading your profile...</p>
+  
+  <div class="card">
+    <h3>Your Status</h3>
+    <p style="margin-bottom: 0;" id="statusText">Checking verification status...</p>
+  </div>
+
+  <button class="btn-logout" onclick="logout()">Logout</button>
+
+  <div id="actionLinks" style="margin-top: 25px; display: flex; justify-content: center; gap: 20px;">
+    <!-- Links will be injected by JavaScript based on verification -->
+  </div>
+</div>
+
+<script type="module">
+  import { auth, ADMIN_EMAIL } from './firebase-config.js';
+  import { onAuthStateChanged, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      document.getElementById('userEmail').innerText = "Logged in as: " + user.email;
+      
+      const statusText = document.getElementById('statusText');
+      const actionLinks = document.getElementById('actionLinks');
+
+      if (user.emailVerified || user.email === ADMIN_EMAIL) {
+        statusText.innerText = "You are successfully logged in and can now access your learning materials.";
+        statusText.style.color = "#ccc";
+        actionLinks.innerHTML = `
+          <a href="index.html" style="all: unset; color: rgba(255,255,255,0.7); font-size: 0.9em; cursor: pointer; text-decoration: underline; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Home</a>
+          <a href="register.html" style="all: unset; color: rgba(255,255,255,0.7); font-size: 0.9em; cursor: pointer; text-decoration: underline; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Enroll in Course</a>
+        `;
+      } else {
+        statusText.innerText = "Please verify your email address to unlock course enrollment. Check your inbox!";
+        statusText.style.color = "#ff6b81";
+        actionLinks.innerHTML = `
+          <a href="#" onclick="resendVerification()" style="all: unset; color: #00c6ff; font-size: 0.9em; cursor: pointer; text-decoration: underline; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#00c6ff'">Resend Verification Email</a>
+          <a href="#" onclick="window.location.reload()" style="all: unset; color: rgba(255,255,255,0.7); font-size: 0.9em; cursor: pointer; text-decoration: underline; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">I have verified (Refresh)</a>
+        `;
+      }
+    } else {
+      alert("❌ Please login first");
+      window.location.href = "login.html";
+    }
+  });
+
+  window.resendVerification = async function() {
+    try {
+      await sendEmailVerification(auth.currentUser);
+      alert("Verification email sent! Please check your inbox.");
+    } catch(err) {
+      alert("Error: " + err.message);
+    }
+  }
+
+  window.logout = function(){
+    signOut(auth).then(() => {
+      window.location.href = "login.html";
+    }).catch((error) => {
+      alert("Error logging out: " + error.message);
+    });
+  }
+</script>
+
+</body>
+</html>
